@@ -1,3 +1,6 @@
 fastapi
 uvicorn[standard]
 pyspark
+pydantic[settings]
+python-dotenv
+dotenv
