@@ -3,7 +3,7 @@ from pyspark.sql.types import IntegerType, DoubleType, LongType, FloatType
 from pyspark.sql.functions import col, count, when, isnan
 
 
-def print_general_stats(name, df):
+def print_general_stats(name: str, df: DataFrame):
     row_count = df.count()
     col_count = len(df.columns)
 
@@ -39,7 +39,7 @@ def print_general_stats(name, df):
     df.show(5, truncate=50)
 
 
-def print_numeric_stats(name, df):
+def print_numeric_stats(name: str, df: DataFrame):
     numeric_types = (IntegerType, DoubleType, LongType, FloatType)
     numeric_cols = [
         field.name for field in df.schema.fields
