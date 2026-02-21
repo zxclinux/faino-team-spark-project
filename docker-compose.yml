@@ -1,0 +1,7 @@
+services:
+  spark:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ${DIR}:/data
