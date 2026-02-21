@@ -1,6 +1,5 @@
 from pyspark.sql import SparkSession
-
-DATA_DIR = "/data"
+from data_loader import load_datasets
 
 spark = (
     SparkSession.builder
@@ -10,21 +9,10 @@ spark = (
     .getOrCreate()
 )
 
-business = spark.read.json(f"{DATA_DIR}/yelp_academic_dataset_business.json")
-review = spark.read.json(f"{DATA_DIR}/yelp_academic_dataset_review.json")
-user = spark.read.json(f"{DATA_DIR}/yelp_academic_dataset_user.json")
-checkin = spark.read.json(f"{DATA_DIR}/yelp_academic_dataset_checkin.json")
-tip = spark.read.json(f"{DATA_DIR}/yelp_academic_dataset_tip.json")
-
-datasets = {
-    "business": business,
-    "review": review,
-    "user": user,
-    "checkin": checkin,
-    "tip": tip,
-}
+datasets = load_datasets(spark, "/data")
 
 for name, df in datasets.items():
+    df.count()
     print(f"\n{'='*60}")
     print(f" {name.upper()} — {df.count():,} rows, {len(df.columns)} columns")
     print(f"{'='*60}")
