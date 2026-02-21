@@ -4,6 +4,4 @@ services:
     env_file:
       - .env
     volumes:
-      - ${DATA_DIR}:/data
-    environment:
-      - DATA_DIR=/data
+      - ${DIR}:/data
