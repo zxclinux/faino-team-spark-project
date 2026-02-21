@@ -1,6 +1,7 @@
 ARG PYTHON_VERSION=3.8
 
 FROM python:${PYTHON_VERSION}-slim-bullseye
+ARG PYSPARK_VERSION=3.5.6
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends openjdk-11-jre-headless \

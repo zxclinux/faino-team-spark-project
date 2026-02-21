@@ -1,6 +1,8 @@
 services:
   spark:
     build: .
+    env_file:
+      - .env
     volumes:
       - ${DATA_DIR}:/data
     environment:
