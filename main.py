@@ -1,8 +1,4 @@
-import os
-from dotenv import load_dotenv
 from pyspark.sql import SparkSession
-
-load_dotenv()
 
 DATA_DIR = "/data"
 
