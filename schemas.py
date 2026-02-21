@@ -93,12 +93,3 @@ class TipSchema:
             StructField("compliment_count", IntegerType(), True),
         ]
     )
-
-
-SCHEMAS = {
-    "business": BusinessSchema.SCHEMA,
-    "review": ReviewSchema.SCHEMA,
-    "user": UserSchema.SCHEMA,
-    "checkin": CheckinSchema.SCHEMA,
-    "tip": TipSchema.SCHEMA,
-}
