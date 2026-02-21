@@ -4,7 +4,7 @@ from pyspark.sql import SparkSession
 
 load_dotenv()
 
-DATA_DIR = os.getenv("DATA_DIR")
+DATA_DIR = "/data"
 
 spark = (
     SparkSession.builder
