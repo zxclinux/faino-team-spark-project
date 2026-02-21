@@ -1,4 +1,5 @@
 from pyspark.sql import SparkSession
+from preprocessing import print_general_stats, print_numeric_stats
 
 DATA_DIR = "/data"
 
@@ -25,8 +26,5 @@ datasets = {
 }
 
 for name, df in datasets.items():
-    print(f"\n{'='*60}")
-    print(f" {name.upper()} — {df.count():,} rows, {len(df.columns)} columns")
-    print(f"{'='*60}")
-    df.printSchema()
-    df.show(5, truncate=50)
+    print_general_stats(name, df)
+    print_numeric_stats(name, df)
