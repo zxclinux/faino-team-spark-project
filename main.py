@@ -14,6 +14,6 @@ datasets = load_datasets(spark, "/data")
 for name, df in datasets.items():
     df.count()
     print(f"\n{'='*60}")
-    print(f" {name.upper()} — {df.count():,} rows, {len(df.columns)} columns") 
+    print(f" {name.upper()} — {df.count():,} rows, {len(df.columns)} columns")
     print(f"{'='*60}")
     df.printSchema()
