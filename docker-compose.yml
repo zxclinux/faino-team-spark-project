@@ -1,0 +1,7 @@
+services:
+  spark:
+    build: .
+    volumes:
+      - ${DATA_DIR}:/data
+    environment:
+      - DATA_DIR=/data
