@@ -1,5 +1,4 @@
 from pyspark.sql import SparkSession
-from data_loader import load_datasets
 
 DATA_DIR = "/data"
 
