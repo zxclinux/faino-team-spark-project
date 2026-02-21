@@ -1,1 +1,3 @@
+pyspark-stubs
 pyspark
+python-dotenv
