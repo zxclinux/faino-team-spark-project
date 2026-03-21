@@ -4,26 +4,15 @@ from pyspark.sql.window import Window
 
 
 def preprocess_review(df: DataFrame) -> DataFrame:
-    # 3) date -> DateType
     df = df.withColumn("date", F.to_date("date"))
-
-    # 4) drop text (not in schema, but just in case), drop unused raw
-    # review schema has no text column — already excluded in schemas.py
-
-    # 5) deduplicate by review_id
     df = df.dropDuplicates(["review_id"])
 
     return df
 
 
 def preprocess_tip(df: DataFrame) -> DataFrame:
-    # 3) date -> DateType
     df = df.withColumn("date", F.to_date("date"))
-
-    # 4) drop text — not needed for any analytical question
     df = df.drop("text")
-
-    # 5) deduplicate by (user_id, business_id, date)
     df = df.dropDuplicates(["user_id", "business_id", "date"])
 
     return df
