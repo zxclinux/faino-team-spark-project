@@ -2,13 +2,11 @@ from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
 
-
 def preprocess_review(df: DataFrame) -> DataFrame:
     df = df.withColumn("date", F.to_date("date"))
     df = df.dropDuplicates(["review_id"])
 
     return df
-
 
 def preprocess_tip(df: DataFrame) -> DataFrame:
     df = df.withColumn("date", F.to_date("date"))
@@ -16,7 +14,6 @@ def preprocess_tip(df: DataFrame) -> DataFrame:
     df = df.dropDuplicates(["user_id", "business_id", "date"])
 
     return df
-
 
 def preprocess_user(df: DataFrame) -> DataFrame:
     # 3) yelping_since -> DateType
@@ -53,7 +50,6 @@ def preprocess_user(df: DataFrame) -> DataFrame:
     df = df.dropDuplicates(["user_id"])
 
     return df
-
 
 def preprocess_business(df: DataFrame, checkin_df: DataFrame) -> DataFrame:
     # 3) is_open -> BooleanType
@@ -125,7 +121,10 @@ def preprocess_business(df: DataFrame, checkin_df: DataFrame) -> DataFrame:
     # 3) merge checkin_count from checkin table
     checkin_counts = checkin_df.withColumn(
         "checkin_count",
-        F.size(F.split(F.col("date"), ",\\s*")),
+        F.when(
+            (F.col("date").isNull()) | (F.trim(F.col("date")) == ""),
+            F.lit(0),
+        ).otherwise(F.size(F.split(F.col("date"), ",\\s*"))),
     ).select("business_id", "checkin_count")
 
     # deduplicate checkin just in case
