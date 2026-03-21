@@ -173,6 +173,7 @@ cython_debug/
 
 # Claude
 .claude/
+CLAUDE.md
 
 # Abstra
 # Abstra is an AI-powered process automation framework.
