@@ -7,6 +7,7 @@ from preprocessing import (
     preprocess_tip,
     preprocess_user,
 )
+from questions import QUESTIONS
 
 spark = (
     SparkSession.builder
@@ -39,3 +40,6 @@ print("=" * 60)
 for name, df in datasets.items():
     print_general_stats(name, df)
     print_numeric_stats(name, df)
+
+for question in QUESTIONS:
+    question.run(datasets)
