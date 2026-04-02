@@ -7,6 +7,7 @@ from preprocessing import (
     preprocess_tip,
     preprocess_user,
 )
+from questions import QUESTIONS, OUTPUT_DIR
 
 spark = (
     SparkSession.builder
@@ -30,7 +31,6 @@ datasets["tip"] = preprocess_tip(datasets["tip"])
 datasets["user"] = preprocess_user(datasets["user"])
 datasets["business"] = preprocess_business(datasets["business"], datasets["checkin"])
 
-# checkin is merged into business — remove standalone table
 del datasets["checkin"]
 
 print("\n" + "=" * 60)
@@ -39,3 +39,12 @@ print("=" * 60)
 for name, df in datasets.items():
     print_general_stats(name, df)
     print_numeric_stats(name, df)
+
+for q in QUESTIONS:
+    print(f"\n[{q.author}] {q.content}")
+    result = q.query(datasets)
+    result.explain(True)
+    result.show(20, truncate=False)
+    result.coalesce(1).write.mode("overwrite").option("header", True).csv(
+        f"{OUTPUT_DIR}/{q.author}/{q.output_name}"
+    )
