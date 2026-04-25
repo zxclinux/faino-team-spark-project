@@ -395,3 +395,154 @@ def q18_popular_user_categories(ds):
         .orderBy(F.desc("review_count"))
     )
 
+
+def q19_top5_businesses_per_city(datasets: dict):
+    """Топ-5 бізнесів за зірковим рейтингом у кожному місті."""
+    business_df = datasets["business"]
+
+    w = Window.partitionBy("city").orderBy(
+        F.desc("stars"), F.desc("review_count"),
+    )
+    ranked = business_df.withColumn("rank", F.row_number().over(w))
+    return ranked.filter(F.col("rank") <= 5).select(
+        "city", "rank", "name", "business_id", "stars", "review_count",
+    )
+
+
+def q20_rating_trend_first_vs_last_year(datasets: dict):
+    """Тренд рейтингу бізнесу: середня оцінка за перший рік відгуків vs останній."""
+    business_df = datasets["business"]
+    review_df = datasets["review"]
+
+    yearly = (
+        review_df
+        .withColumn("year", F.year("date"))
+        .groupBy("business_id", "year")
+        .agg(F.avg("stars").alias("year_avg_stars"))
+    )
+
+    # at least 2 distinct years to define a trend
+    multi_year = yearly.groupBy("business_id").agg(
+        F.countDistinct("year").alias("years_covered"),
+    ).filter(F.col("years_covered") >= 2)
+
+    yearly = yearly.join(multi_year, on="business_id")
+
+    w_full = (
+        Window.partitionBy("business_id")
+        .orderBy("year")
+        .rowsBetween(Window.unboundedPreceding, Window.unboundedFollowing)
+    )
+    with_endpoints = (
+        yearly
+        .withColumn("first_year", F.first("year").over(w_full))
+        .withColumn("last_year", F.last("year").over(w_full))
+        .withColumn("first_year_avg", F.first("year_avg_stars").over(w_full))
+        .withColumn("last_year_avg", F.last("year_avg_stars").over(w_full))
+    )
+
+    per_biz = with_endpoints.select(
+        "business_id", "first_year", "last_year",
+        "first_year_avg", "last_year_avg", "years_covered",
+    ).dropDuplicates(["business_id"])
+
+    per_biz = per_biz.withColumn(
+        "trend", F.round(F.col("last_year_avg") - F.col("first_year_avg"), 2),
+    )
+
+    return (
+        per_biz.join(business_df.select("business_id", "name", "state"), on="business_id")
+        .orderBy(F.desc(F.abs(F.col("trend"))))
+        .select(
+            "name", "business_id", "state",
+            "first_year", "first_year_avg",
+            "last_year", "last_year_avg",
+            "trend", "years_covered",
+        )
+    )
+
+
+def q21_top_categories_by_tips(datasets: dict):
+    """Категорії бізнесу, що отримують найбільше порад (tips)."""
+    business_df = datasets["business"]
+    tip_df = datasets["tip"]
+
+    tips_per_biz = tip_df.groupBy("business_id").agg(
+        F.count("*").alias("tip_count"),
+    )
+    joined = business_df.join(tips_per_biz, on="business_id")
+    exploded = joined.select(
+        F.explode("categories").alias("category"),
+        "tip_count",
+    )
+    return (
+        exploded.groupBy("category")
+        .agg(F.sum("tip_count").alias("total_tips"))
+        .orderBy(F.desc("total_tips"))
+        .limit(20)
+    )
+
+
+def q22_top10_categories_by_avg_rating(datasets: dict):
+    """Топ-10 категорій бізнесу за середнім рейтингом (≥50 бізнесами)."""
+    business_df = datasets["business"]
+
+    exploded = business_df.select(
+        F.explode("categories").alias("category"),
+        "stars",
+    )
+    return (
+        exploded.groupBy("category")
+        .agg(
+            F.avg("stars").alias("avg_stars"),
+            F.count("*").alias("biz_count"),
+        )
+        .filter(F.col("biz_count") >= 50)
+        .orderBy(F.desc("avg_stars"))
+        .limit(10)
+    )
+
+
+def q23_top10_users_by_useful_votes(datasets: dict):
+    """Топ-10 користувачів, чиї відгуки отримали найбільше голосів useful."""
+    review_df = datasets["review"]
+    user_df = datasets["user"]
+
+    useful_per_user = review_df.groupBy("user_id").agg(
+        F.sum("useful").alias("total_useful_on_reviews"),
+        F.count("*").alias("review_count_actual"),
+    )
+    return (
+        useful_per_user.join(
+            user_df.select("user_id", "name", "fans"), on="user_id",
+        )
+        .orderBy(F.desc("total_useful_on_reviews"))
+        .limit(10)
+        .select(
+            "user_id", "name", "total_useful_on_reviews",
+            "review_count_actual", "fans",
+        )
+    )
+
+
+def q24_elite_users_most_funny_reviews(datasets: dict):
+    """Elite-користувачі з найбільшою кількістю funny-відгуків."""
+    review_df = datasets["review"]
+    user_df = datasets["user"]
+
+    elite_users = user_df.filter(F.size("elite") > 0).select("user_id", "name")
+
+    funny_reviews = review_df.filter(F.col("funny") > 0).select(
+        "user_id", F.col("funny").alias("review_funny"),
+    )
+
+    return (
+        elite_users.join(funny_reviews, on="user_id")
+        .groupBy("user_id", "name")
+        .agg(
+            F.count("*").alias("funny_review_count"),
+            F.sum("review_funny").alias("total_funny_votes"),
+        )
+        .orderBy(F.desc("funny_review_count"))
+        .limit(20)
+    )
