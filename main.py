@@ -1,6 +1,13 @@
 from pyspark.sql import SparkSession
-
-DATA_DIR = "/data"
+from data_loader import load_datasets
+from stats import print_general_stats, print_numeric_stats
+from preprocessing import (
+    preprocess_business,
+    preprocess_review,
+    preprocess_tip,
+    preprocess_user,
+)
+from questions import QUESTIONS
 
 spark = (
     SparkSession.builder
@@ -9,24 +16,31 @@ spark = (
     .config("spark.driver.memory", "4g")
     .getOrCreate()
 )
+spark.sparkContext.setLogLevel("ERROR")
 
-business = spark.read.json(f"{DATA_DIR}/yelp_academic_dataset_business.json")
-review = spark.read.json(f"{DATA_DIR}/yelp_academic_dataset_review.json")
-user = spark.read.json(f"{DATA_DIR}/yelp_academic_dataset_user.json")
-checkin = spark.read.json(f"{DATA_DIR}/yelp_academic_dataset_checkin.json")
-tip = spark.read.json(f"{DATA_DIR}/yelp_academic_dataset_tip.json")
+datasets = load_datasets(spark, "/data")
 
-datasets = {
-    "business": business,
-    "review": review,
-    "user": user,
-    "checkin": checkin,
-    "tip": tip,
-}
-
+print("\n" + "=" * 60)
+print(" RAW DATA STATISTICS")
+print("=" * 60)
 for name, df in datasets.items():
-    print(f"\n{'='*60}")
-    print(f" {name.upper()} — {df.count():,} rows, {len(df.columns)} columns")
-    print(f"{'='*60}")
-    df.printSchema()
-    df.show(5, truncate=50)
+    print_general_stats(name, df)
+    print_numeric_stats(name, df)
+
+datasets["review"] = preprocess_review(datasets["review"])
+datasets["tip"] = preprocess_tip(datasets["tip"])
+datasets["user"] = preprocess_user(datasets["user"])
+datasets["business"] = preprocess_business(datasets["business"], datasets["checkin"])
+
+# checkin is merged into business — remove standalone table
+del datasets["checkin"]
+
+print("\n" + "=" * 60)
+print(" PREPROCESSED DATA STATISTICS")
+print("=" * 60)
+for name, df in datasets.items():
+    print_general_stats(name, df)
+    print_numeric_stats(name, df)
+
+for question in QUESTIONS:
+    question.run(datasets)
