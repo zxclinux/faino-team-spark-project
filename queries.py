@@ -164,10 +164,7 @@ def q9_median_friends_vs_rest_rating(datasets: dict):
     review_df = datasets["review"]
     user_df = datasets["user"]
 
-    users = user_df.withColumn(
-        "friends_count",
-        F.size(F.col("friends"))
-    ).select("user_id", "friends_count")
+    users = user_df.select("user_id", "friends_count")
 
     w = Window.partitionBy().rowsBetween(
         Window.unboundedPreceding,
@@ -249,10 +246,7 @@ def q12_friends_vs_avg_useful_votes(datasets: dict):
     review_df = datasets["review"]
     user_df = datasets["user"]
 
-    users = user_df.withColumn(
-        "friends_count",
-        F.size(F.col("friends")),
-    ).select("user_id", "friends_count")
+    users = user_df.select("user_id", "friends_count")
 
     review_stats = review_df.groupBy("user_id").agg(
         F.avg("useful").alias("avg_useful_per_review"),
