@@ -67,35 +67,35 @@ QUESTIONS.append(Question(
 QUESTIONS.append(Question(
     "Середній рейтинг від активних оглядачів (>100 reviews) vs загальний середній",
     q7_active_reviewers_vs_all_avg_rating,
-    author="John Doe"
+    author="Yaroslav Vasylyshyn"
 ))
 
 QUESTIONS.append(Question(
     "Порівняння середнього рейтингу від elite vs non-elite користувачів",
     q8_elite_vs_non_elite_rating,
-    author="John Doe"
+    author="Yaroslav Vasylyshyn"
 ))
 
 QUESTIONS.append(Question(
     "Користувачі з друзями вище медіани vs решта: середній рейтинг",
     q9_median_friends_vs_rest_rating,
-    author="John Doe"
+    author="Yaroslav Vasylyshyn"
 ))
 
 QUESTIONS.append(Question(
     "Moving average рейтингу по останніх 10 відгуках для кожного бізнесу",
     q10_business_moving_avg_last10_reviews,
-    author="John Doe"
+    author="Yaroslav Vasylyshyn"
 ))
 
 QUESTIONS.append(Question(
     "Користувачі з >100 reviews, які жодного разу не отримали useful",
     q11_active_users_no_useful_votes,
-    author="John Doe"
+    author="Yaroslav Vasylyshyn"
 ))
 
 QUESTIONS.append(Question(
     "Зв'язок між друзями користувача та avg useful на його review",
     q12_friends_vs_avg_useful_votes,
-    author="John Doe"
+    author="Yaroslav Vasylyshyn"
 ))
