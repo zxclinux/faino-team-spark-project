@@ -16,6 +16,7 @@ spark = (
     .config("spark.driver.memory", "4g")
     .getOrCreate()
 )
+spark.sparkContext.setLogLevel("ERROR")
 
 datasets = load_datasets(spark, "/data")
 
