@@ -46,9 +46,9 @@ def _category_col(category: str) -> str:
 
 
 def build_business_features(datasets: dict):
-    """Таблиця ознак для регресії: один рядок на бізнес, label = business.stars.
+    """Build one row per business with model features and label = business.stars.
 
-    avg(review.stars) свідомо НЕ використовується — це майже та сама ціль (leakage).
+    avg(review.stars) is deliberately left out: it is almost the target itself (leakage).
 
     Returns:
         (DataFrame, numeric_feature_cols, categorical_feature_cols)
