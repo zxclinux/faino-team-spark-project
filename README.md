@@ -63,3 +63,8 @@ Faino Team
 
 Етап запису результатів:
 Кожен учасник: Реалізує функцію запису своїх відповідей у .csv, налаштовує параметри запису та ігнорування результатів у .gitignore, координує структури вихідних папок output/, перевіряє коректність формату записаних файлів та виконує збір усіх планів у документацію проекту.
+
+Етап аналізу даних:
+Дмитро: Регресійна модель для business.stars — побудова таблиці ознак (ml_features.py), навчання та порівняння LinearRegression, DecisionTreeRegressor, RandomForestRegressor, GBTRegressor з крос-валідацією (regression.py), оцінка RMSE / R² / MAE, аналіз процесу навчання (objective history, крива навчання GBT, важливість ознак).
+
+Запуск лише ML-етапу: docker compose run --rm spark python main.py --stage ml

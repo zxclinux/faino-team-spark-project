@@ -15,6 +15,8 @@ class BusinessSchema:
             StructField("name", StringType(), True),
             StructField("city", StringType(), True),
             StructField("state", StringType(), True),
+            StructField("latitude", DoubleType(), True),
+            StructField("longitude", DoubleType(), True),
             StructField("stars", DoubleType(), True),
             StructField("review_count", IntegerType(), True),
             StructField("is_open", IntegerType(), True),
