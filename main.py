@@ -1,3 +1,5 @@
+import argparse
+
 from pyspark.sql import SparkSession
 from data_loader import load_datasets
 from stats import print_general_stats, print_numeric_stats
@@ -8,6 +10,16 @@ from preprocessing import (
     preprocess_user,
 )
 from questions import QUESTIONS
+from regression import run_regression
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--stage",
+    choices=["all", "queries", "ml"],
+    default="all",
+    help="queries — stats + business questions, ml — regression only",
+)
+args = parser.parse_args()
 
 spark = (
     SparkSession.builder
@@ -20,12 +32,13 @@ spark.sparkContext.setLogLevel("ERROR")
 
 datasets = load_datasets(spark, "/data")
 
-print("\n" + "=" * 60)
-print(" RAW DATA STATISTICS")
-print("=" * 60)
-for name, df in datasets.items():
-    print_general_stats(name, df)
-    print_numeric_stats(name, df)
+if args.stage != "ml":
+    print("\n" + "=" * 60)
+    print(" RAW DATA STATISTICS")
+    print("=" * 60)
+    for name, df in datasets.items():
+        print_general_stats(name, df)
+        print_numeric_stats(name, df)
 
 datasets["review"] = preprocess_review(datasets["review"])
 datasets["tip"] = preprocess_tip(datasets["tip"])
@@ -35,12 +48,16 @@ datasets["business"] = preprocess_business(datasets["business"], datasets["check
 # checkin is merged into business — remove standalone table
 del datasets["checkin"]
 
-print("\n" + "=" * 60)
-print(" PREPROCESSED DATA STATISTICS")
-print("=" * 60)
-for name, df in datasets.items():
-    print_general_stats(name, df)
-    print_numeric_stats(name, df)
+if args.stage != "ml":
+    print("\n" + "=" * 60)
+    print(" PREPROCESSED DATA STATISTICS")
+    print("=" * 60)
+    for name, df in datasets.items():
+        print_general_stats(name, df)
+        print_numeric_stats(name, df)
 
-for question in QUESTIONS:
-    question.run(datasets)
+    for question in QUESTIONS:
+        question.run(datasets)
+
+if args.stage != "queries":
+    run_regression(spark, datasets, "/data/output/ml")

@@ -1,3 +1,4 @@
 pyspark-stubs
 pyspark
 python-dotenv
+numpy
