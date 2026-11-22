@@ -11,13 +11,14 @@ from preprocessing import (
 )
 from questions import QUESTIONS
 from regression import run_regression
+from classification import run_classification
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "--stage",
     choices=["all", "queries", "ml"],
     default="all",
-    help="queries — stats + business questions, ml — regression only",
+    help="queries — stats + business questions, ml — regression + classification only",
 )
 args = parser.parse_args()
 
@@ -61,3 +62,4 @@ if args.stage != "ml":
 
 if args.stage != "queries":
     run_regression(spark, datasets, "/data/output/ml")
+    run_classification(spark, datasets, "/data/output/ml")
